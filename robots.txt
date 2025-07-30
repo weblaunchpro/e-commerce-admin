@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+Allow: /css/
+Allow: /js/
+Allow: /src/
+
+# Disallow access to PHP backend and sensitive files
+Disallow: /php/
+Disallow: *.json
+Disallow: *.log
+Disallow: /.htaccess
+Disallow: /package.json
+Disallow: /composer.json
+
+# Sitemap (add when available)
+# Sitemap: https://yourdomain.com/sitemap.xml
+
+# Golden Crumb Biscuit Company
+# Quality handcrafted biscuits since 1985 

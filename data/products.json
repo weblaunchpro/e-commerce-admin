@@ -1,0 +1,112 @@
+[
+    {
+        "id": 1,
+        "name": "Classic Butter Biscuits",
+        "description": "Our signature buttery biscuits made with premium ingredients. Perfect with tea or coffee.",
+        "price": 8.99,
+        "category": "sweet",
+        "image": "images/butter-biscuits.jpg",
+        "ingredients": ["Flour", "Butter", "Sugar", "Eggs", "Vanilla"],
+        "in_stock": true,
+        "featured": true
+    },
+    {
+        "id": 2,
+        "name": "Chocolate Chip Delights",
+        "description": "Crispy biscuits loaded with premium dark chocolate chips. A crowd favorite!",
+        "price": 12.50,
+        "category": "sweet",
+        "image": "images/chocolate-chip.jpg",
+        "ingredients": ["Flour", "Butter", "Brown Sugar", "Chocolate Chips", "Vanilla"],
+        "in_stock": true,
+        "featured": true
+    },
+    {
+        "id": 3,
+        "name": "Savory Herb Crackers",
+        "description": "Light and crispy crackers infused with fresh herbs. Perfect for cheese platters.",
+        "price": 9.75,
+        "category": "savory",
+        "image": "images/herb-crackers.jpg",
+        "ingredients": ["Flour", "Olive Oil", "Herbs", "Sea Salt", "Garlic"],
+        "in_stock": true,
+        "featured": false
+    },
+    {
+        "id": 4,
+        "name": "Honey Oat Biscuits",
+        "description": "Wholesome oat biscuits sweetened with pure honey. Healthy and delicious.",
+        "price": 10.25,
+        "category": "sweet",
+        "image": "images/honey-oat.jpg",
+        "ingredients": ["Oats", "Flour", "Honey", "Butter", "Cinnamon"],
+        "in_stock": true,
+        "featured": true
+    },
+    {
+        "id": 5,
+        "name": "Cheese & Chive Biscuits",
+        "description": "Flaky biscuits with aged cheddar cheese and fresh chives. Perfect for brunch.",
+        "price": 11.00,
+        "category": "savory",
+        "image": "images/cheese-chive.jpg",
+        "ingredients": ["Flour", "Butter", "Cheddar Cheese", "Chives", "Buttermilk"],
+        "in_stock": true,
+        "featured": false
+    },
+    {
+        "id": 6,
+        "name": "Gingerbread Cookies",
+        "description": "Traditional gingerbread cookies with warming spices. A holiday favorite all year round.",
+        "price": 13.50,
+        "category": "specialty",
+        "image": "images/gingerbread.jpg",
+        "ingredients": ["Flour", "Molasses", "Ginger", "Cinnamon", "Cloves"],
+        "in_stock": true,
+        "featured": true
+    },
+    {
+        "id": 7,
+        "name": "Rosemary Sea Salt Crackers",
+        "description": "Artisanal crackers with fresh rosemary and sea salt. Pairs perfectly with wine.",
+        "price": 14.00,
+        "category": "savory",
+        "image": "images/rosemary-crackers.jpg",
+        "ingredients": ["Flour", "Olive Oil", "Rosemary", "Sea Salt", "Black Pepper"],
+        "in_stock": false,
+        "featured": false
+    },
+    {
+        "id": 8,
+        "name": "Lemon Shortbread",
+        "description": "Delicate shortbread cookies with bright lemon zest. Light and refreshing.",
+        "price": 11.75,
+        "category": "sweet",  
+        "image": "images/lemon-shortbread.jpg",
+        "ingredients": ["Flour", "Butter", "Sugar", "Lemon Zest", "Vanilla"],
+        "in_stock": true,
+        "featured": false
+    },
+    {
+        "id": 9,
+        "name": "Almond Biscotti",
+        "description": "Traditional Italian twice-baked biscuits with toasted almonds. Perfect with coffee.",
+        "price": 15.50,
+        "category": "specialty",
+        "image": "images/almond-biscotti.jpg",
+        "ingredients": ["Flour", "Almonds", "Sugar", "Eggs", "Anise"],
+        "in_stock": true,
+        "featured": true
+    },
+    {
+        "id": 10,
+        "name": "Cinnamon Sugar Cookies",
+        "description": "Soft cookies rolled in cinnamon sugar. A comforting classic that never goes out of style.",
+        "price": 9.25,
+        "category": "sweet",
+        "image": "images/cinnamon-sugar.jpg",
+        "ingredients": ["Flour", "Butter", "Sugar", "Cinnamon", "Cream of Tartar"],
+        "in_stock": true,
+        "featured": false
+    }
+] 

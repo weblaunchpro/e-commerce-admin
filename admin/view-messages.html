@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Messages - Golden Crumb Admin</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="admin-dashboard">
+    <header class="admin-header">
+        <nav class="admin-nav">
+            <div class="admin-logo">
+                <i class="fas fa-cookie-bite"></i>
+                <span>Golden Crumb Admin</span>
+            </div>
+            <div class="admin-user">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="admin-username">Admin</span>
+                </div>
+                <button onclick="AdminAuth.logout()" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="admin-container">
+        <div class="products-header">
+            <div class="header-left">
+                <h1 class="page-title">Contact Messages</h1>
+                <p style="color: var(--text-light); font-size: 1.1rem;">
+                    View and manage customer inquiries and contact form submissions
+                </p>
+            </div>
+            <div class="header-actions">
+                <a href="dashboard.html" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+                <button class="btn btn-info" onclick="exportMessages()">
+                    <i class="fas fa-download"></i>
+                    Export CSV
+                </button>
+            </div>
+        </div>
+
+        <!-- Messages Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 id="total-messages">-</h3>
+                    <p>Total Messages</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon" style="background: var(--success);">
+                    <i class="fas fa-calendar-day"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 id="today-messages">-</h3>
+                    <p>Today</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon" style="background: var(--warning);">
+                    <i class="fas fa-calendar-week"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 id="week-messages">-</h3>
+                    <p>This Week</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon" style="background: var(--info);">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 id="recent-messages">-</h3>
+                    <p>Last 24 Hours</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages List -->
+        <div class="dashboard-card">
+            <div class="table-header">
+                <h3 class="card-title">Customer Messages</h3>
+                <div class="table-actions">
+                    <button class="btn btn-secondary" onclick="refreshMessages()">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh
+                    </button>
+                    <button class="btn btn-danger" onclick="clearAllMessages()">
+                        <i class="fas fa-trash"></i>
+                        Clear All
+                    </button>
+                </div>
+            </div>
+            
+            <div class="messages-container" id="messages-container">
+                <div class="loading-messages">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    Loading messages...
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Message Detail Modal -->
+    <div id="message-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Message Details</h2>
+                <button class="modal-close" onclick="closeMessageModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="message-detail-content">
+                <!-- Message details will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" onclick="deleteMessage()" id="delete-message-btn">
+                    <i class="fas fa-trash"></i>
+                    Delete Message
+                </button>
+                <button class="btn btn-secondary" onclick="closeMessageModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/admin.js"></script>
+    <script>
+        let allMessages = [];
+        let currentMessageId = null;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            if (!AdminAuth.requireAuth()) {
+                return;
+            }
+
+            // Update session info
+            updateSessionInfo();
+            
+            // Load messages
+            loadMessages();
+        });
+
+        function loadMessages() {
+            try {
+                allMessages = ContactManager.getMessages();
+                updateStats();
+                displayMessages();
+                
+            } catch (error) {
+                console.error('Error loading messages:', error);
+                AdminUtils.showNotification('Error loading messages', 'error');
+            }
+        }
+
+        function updateStats() {
+            const stats = ContactManager.getStats();
+            
+            document.getElementById('total-messages').textContent = stats.total;
+            document.getElementById('today-messages').textContent = stats.today;
+            document.getElementById('week-messages').textContent = stats.thisWeek;
+            
+            // Calculate last 24 hours
+            const last24Hours = allMessages.filter(m => {
+                const messageDate = new Date(m.timestamp);
+                const twentyFourHoursAgo = new Date();
+                twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24);
+                return messageDate >= twentyFourHoursAgo;
+            }).length;
+            
+            document.getElementById('recent-messages').textContent = last24Hours;
+        }
+
+        function displayMessages() {
+            const container = document.getElementById('messages-container');
+            
+            if (allMessages.length === 0) {
+                container.innerHTML = `
+                    <div class="no-messages">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No messages yet</h3>
+                        <p>Customer contact form submissions will appear here.</p>
+                        <small>Messages are stored in browser localStorage for this demo.</small>
+                    </div>
+                `;
+                return;
+            }
+
+            // Sort messages by date (newest first)
+            const sortedMessages = [...allMessages].sort((a, b) => 
+                new Date(b.timestamp) - new Date(a.timestamp)
+            );
+
+            container.innerHTML = sortedMessages.map((message, index) => `
+                <div class="message-card" onclick="viewMessage(${index})">
+                    <div class="message-header">
+                        <div class="message-from">
+                            <div class="contact-info">
+                                <strong>${message.name}</strong>
+                                <span class="email">${message.email}</span>
+                                ${message.phone ? `<span class="phone">${message.phone}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="message-date">
+                            <i class="fas fa-clock"></i>
+                            ${AdminUtils.formatDate(message.timestamp)}
+                        </div>
+                    </div>
+                    
+                    <div class="message-preview">
+                        <p>${message.message.length > 120 ? message.message.substring(0, 120) + '...' : message.message}</p>
+                    </div>
+                    
+                    <div class="message-actions">
+                        <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); viewMessage(${index})">
+                            <i class="fas fa-eye"></i>
+                            View
+                        </button>
+                        <button class="btn btn-sm btn-info" onclick="event.stopPropagation(); replyToMessage('${message.email}', '${message.name}')">
+                            <i class="fas fa-reply"></i>
+                            Reply
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); deleteMessageByIndex(${index})">
+                            <i class="fas fa-trash"></i>
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function viewMessage(index) {
+            const message = allMessages.sort((a, b) => 
+                new Date(b.timestamp) - new Date(a.timestamp)
+            )[index];
+            
+            if (!message) return;
+            
+            currentMessageId = index;
+            
+            const content = `
+                <div class="message-details">
+                    <div class="detail-section">
+                        <h4><i class="fas fa-user"></i> Contact Information</h4>
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <label>Name:</label>
+                                <span>${message.name}</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>Email:</label>
+                                <span><a href="mailto:${message.email}">${message.email}</a></span>
+                            </div>
+                            ${message.phone ? `
+                                <div class="detail-item">
+                                    <label>Phone:</label>
+                                    <span><a href="tel:${message.phone}">${message.phone}</a></span>
+                                </div>
+                            ` : ''}
+                            <div class="detail-item">
+                                <label>Date:</label>
+                                <span>${AdminUtils.formatDate(message.timestamp)}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h4><i class="fas fa-comment"></i> Message</h4>
+                        <div class="message-text">
+                            ${message.message.replace(/\n/g, '<br>')}
+                        </div>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h4><i class="fas fa-tools"></i> Quick Actions</h4>
+                        <div class="quick-actions">
+                            <button class="btn btn-info" onclick="replyToMessage('${message.email}', '${message.name}')">
+                                <i class="fas fa-reply"></i>
+                                Reply via Email
+                            </button>
+                            <button class="btn btn-secondary" onclick="copyToClipboard('${message.email}')">
+                                <i class="fas fa-copy"></i>
+                                Copy Email
+                            </button>
+                            ${message.phone ? `
+                                <button class="btn btn-secondary" onclick="copyToClipboard('${message.phone}')">
+                                    <i class="fas fa-phone"></i>
+                                    Copy Phone
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('message-detail-content').innerHTML = content;
+            document.getElementById('message-modal').style.display = 'flex';
+        }
+
+        function closeMessageModal() {
+            document.getElementById('message-modal').style.display = 'none';
+            currentMessageId = null;
+        }
+
+        function deleteMessage() {
+            if (currentMessageId === null) return;
+            
+            const sortedMessages = allMessages.sort((a, b) => 
+                new Date(b.timestamp) - new Date(a.timestamp)
+            );
+            const messageToDelete = sortedMessages[currentMessageId];
+            
+            if (confirm(`Are you sure you want to delete the message from ${messageToDelete.name}?`)) {
+                // Find and remove the message from the original array
+                const originalIndex = allMessages.findIndex(m => 
+                    m.timestamp === messageToDelete.timestamp && 
+                    m.email === messageToDelete.email
+                );
+                
+                if (originalIndex !== -1) {
+                    allMessages.splice(originalIndex, 1);
+                    localStorage.setItem('contactMessages', JSON.stringify(allMessages));
+                    
+                    AdminUtils.showNotification('Message deleted successfully!', 'success');
+                    closeMessageModal();
+                    loadMessages(); // Refresh the display
+                }
+            }
+        }
+
+        function deleteMessageByIndex(index) {
+            const sortedMessages = allMessages.sort((a, b) => 
+                new Date(b.timestamp) - new Date(a.timestamp)
+            );
+            const messageToDelete = sortedMessages[index];
+            
+            if (confirm(`Are you sure you want to delete the message from ${messageToDelete.name}?`)) {
+                // Find and remove the message from the original array
+                const originalIndex = allMessages.findIndex(m => 
+                    m.timestamp === messageToDelete.timestamp && 
+                    m.email === messageToDelete.email
+                );
+                
+                if (originalIndex !== -1) {
+                    allMessages.splice(originalIndex, 1);
+                    localStorage.setItem('contactMessages', JSON.stringify(allMessages));
+                    
+                    AdminUtils.showNotification('Message deleted successfully!', 'success');
+                    loadMessages(); // Refresh the display
+                }
+            }
+        }
+
+        function replyToMessage(email, name) {
+            const subject = `Re: Your inquiry to Golden Crumb Biscuit Company`;
+            const body = `Dear ${name},\n\nThank you for contacting Golden Crumb Biscuit Company.\n\n\n\nBest regards,\nThe Golden Crumb Team`;
+            
+            const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.location.href = mailtoLink;
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                AdminUtils.showNotification(`Copied "${text}" to clipboard!`, 'success');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                AdminUtils.showNotification(`Copied "${text}" to clipboard!`, 'success');
+            });
+        }
+
+        function refreshMessages() {
+            loadMessages();
+            AdminUtils.showNotification('Messages refreshed!', 'info');
+        }
+
+        function clearAllMessages() {
+            if (allMessages.length === 0) {
+                AdminUtils.showNotification('No messages to clear', 'info');
+                return;
+            }
+            
+            if (confirm(`Are you sure you want to delete all ${allMessages.length} messages?\n\nThis action cannot be undone.`)) {
+                localStorage.removeItem('contactMessages');
+                allMessages = [];
+                loadMessages();
+                AdminUtils.showNotification('All messages cleared!', 'success');
+            }
+        }
+
+        function exportMessages() {
+            if (allMessages.length === 0) {
+                AdminUtils.showNotification('No messages to export', 'info');
+                return;
+            }
+            
+            const csv = convertMessagesToCSV(allMessages);
+            downloadCSV(csv, 'contact-messages.csv');
+            AdminUtils.showNotification('Messages exported successfully!', 'success');
+        }
+
+        function convertMessagesToCSV(messages) {
+            const headers = ['Date', 'Name', 'Email', 'Phone', 'Message'];
+            const rows = messages.map(message => [
+                AdminUtils.formatDate(message.timestamp),
+                `"${message.name}"`,
+                message.email,
+                message.phone || '',
+                `"${message.message.replace(/"/g, '""')}"`
+            ]);
+            
+            return [headers, ...rows].map(row => row.join(',')).join('\n');
+        }
+
+        function downloadCSV(csv, filename) {
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function updateSessionInfo() {
+            const session = AdminAuth.getSession();
+            if (session) {
+                document.getElementById('admin-username').textContent = `Welcome, ${session.username}!`;
+            }
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(e) {
+            const modal = document.getElementById('message-modal');
+            if (e.target === modal) {
+                closeMessageModal();
+            }
+        });
+    </script>
+
+    <style>
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .stat-content h3 {
+            margin: 0;
+            font-size: 1.8rem;
+            color: var(--text-dark);
+        }
+
+        .stat-content p {
+            margin: 0;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .messages-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .loading-messages {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+        }
+
+        .no-messages {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+        }
+
+        .no-messages i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .message-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .message-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .contact-info strong {
+            display: block;
+            color: var(--text-dark);
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .contact-info .email {
+            color: var(--primary-color);
+            font-size: 0.9rem;
+            display: block;
+        }
+
+        .contact-info .phone {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            display: block;
+        }
+
+        .message-date {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .message-preview p {
+            color: var(--text-dark);
+            line-height: 1.5;
+            margin: 0 0 1rem 0;
+        }
+
+        .message-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            padding: 1.5rem;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .message-details {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .detail-section h4 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .detail-item label {
+            font-weight: 600;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .detail-item span {
+            color: var(--text-dark);
+        }
+
+        .detail-item a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .detail-item a:hover {
+            text-decoration: underline;
+        }
+
+        .message-text {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+            line-height: 1.6;
+            color: var(--text-dark);
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .message-header {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .message-actions {
+                justify-content: stretch;
+            }
+            
+            .message-actions .btn {
+                flex: 1;
+            }
+            
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-actions {
+                flex-direction: column;
+            }
+            
+            .table-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+            
+            .table-actions {
+                justify-content: stretch;
+            }
+            
+            .table-actions .btn {
+                flex: 1;
+            }
+        }
+    </style>
+</body>
+</html> 

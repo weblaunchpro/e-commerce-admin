@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Sync - Golden Crumb Admin</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="admin-dashboard">
+    <header class="admin-header">
+        <nav class="admin-nav">
+            <div class="admin-logo">
+                <i class="fas fa-cookie-bite"></i>
+                <span>Golden Crumb Admin</span>
+            </div>
+            <div class="admin-user">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="admin-username">Admin</span>
+                </div>
+                <button onclick="AdminAuth.logout()" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="admin-container">
+        <div class="products-header">
+            <div class="header-left">
+                <h1 class="page-title">Data Synchronization</h1>
+                <p style="color: var(--text-light); font-size: 1.1rem;">
+                    Manage your product data storage and synchronization
+                </p>
+            </div>
+            <div class="header-actions">
+                <a href="dashboard.html" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- Data Status -->
+        <div class="dashboard-card">
+            <h3 class="card-title">
+                <i class="fas fa-database"></i>
+                Current Data Status
+            </h3>
+            
+            <div class="data-status-grid">
+                <div class="status-item">
+                    <div class="status-header">
+                        <i class="fas fa-hard-drive"></i>
+                        <h4>LocalStorage Products</h4>
+                    </div>
+                    <div class="status-content">
+                        <div class="status-value" id="localStorage-count">-</div>
+                        <div class="status-description">Products in browser storage</div>
+                        <div class="status-actions">
+                            <button class="btn btn-sm btn-info" onclick="viewLocalStorageData()">
+                                <i class="fas fa-eye"></i>
+                                View Data
+                            </button>
+                            <button class="btn btn-sm btn-warning" onclick="clearLocalStorage()">
+                                <i class="fas fa-trash"></i>
+                                Clear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="status-item">
+                    <div class="status-header">
+                        <i class="fas fa-file-code"></i>
+                        <h4>JSON File Products</h4>
+                    </div>
+                    <div class="status-content">
+                        <div class="status-value" id="json-count">-</div>
+                        <div class="status-description">Products in data/products.json</div>
+                        <div class="status-actions">
+                            <button class="btn btn-sm btn-info" onclick="viewJsonData()">
+                                <i class="fas fa-eye"></i>
+                                View Data
+                            </button>
+                            <button class="btn btn-sm btn-success" onclick="loadFromJson()">
+                                <i class="fas fa-download"></i>
+                                Load to Storage
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sync Actions -->
+        <div class="dashboard-card">
+            <h3 class="card-title">
+                <i class="fas fa-sync-alt"></i>
+                Synchronization Actions
+            </h3>
+            
+            <div class="sync-actions-grid">
+                <div class="sync-action">
+                    <div class="sync-icon">
+                        <i class="fas fa-download"></i>
+                    </div>
+                    <div class="sync-content">
+                        <h4>Import from JSON</h4>
+                        <p>Load products from data/products.json into localStorage. This will replace any existing localStorage data.</p>
+                        <button class="btn btn-primary" onclick="importFromJson()">
+                            <i class="fas fa-file-import"></i>
+                            Import Products
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="sync-action">
+                    <div class="sync-icon">
+                        <i class="fas fa-upload"></i>
+                    </div>
+                    <div class="sync-content">
+                        <h4>Export to JSON</h4>
+                        <p>Download your current localStorage products as a JSON file that you can save as data/products.json.</p>
+                        <button class="btn btn-success" onclick="exportToJson()">
+                            <i class="fas fa-file-export"></i>
+                            Export Products
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="sync-action">
+                    <div class="sync-icon">
+                        <i class="fas fa-redo"></i>
+                    </div>
+                    <div class="sync-content">
+                        <h4>Reset to Default</h4>
+                        <p>Clear localStorage and reload the original data from data/products.json. This will lose any admin changes.</p>
+                        <button class="btn btn-warning" onclick="resetToDefault()">
+                            <i class="fas fa-undo"></i>
+                            Reset Data
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="sync-action">
+                    <div class="sync-icon">
+                        <i class="fas fa-trash-alt"></i>
+                    </div>
+                    <div class="sync-content">
+                        <h4>Clear All Data</h4>
+                        <p>Remove all product data from localStorage. The website will fall back to data/products.json.</p>
+                        <button class="btn btn-danger" onclick="clearAllData()">
+                            <i class="fas fa-trash"></i>
+                            Clear All
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- How It Works -->
+        <div class="dashboard-card">
+            <h3 class="card-title">
+                <i class="fas fa-info-circle"></i>
+                How Data Storage Works
+            </h3>
+            
+            <div class="info-content">
+                <div class="info-section">
+                    <h4><i class="fas fa-hard-drive"></i> LocalStorage (Primary)</h4>
+                    <p>When you add, edit, or delete products in the admin panel, they are saved to your browser's localStorage. This is the primary data source for both the admin panel and main website.</p>
+                    <ul>
+                        <li>✅ <strong>Fast:</strong> Instant loading and saving</li>
+                        <li>✅ <strong>Persistent:</strong> Survives browser restarts</li>
+                        <li>⚠️ <strong>Local only:</strong> Not shared between devices/browsers</li>
+                    </ul>
+                </div>
+                
+                <div class="info-section">
+                    <h4><i class="fas fa-file-code"></i> JSON File (Backup)</h4>
+                    <p>The data/products.json file serves as initial data and backup. It's only used when localStorage is empty (first time loading).</p>
+                    <ul>
+                        <li>✅ <strong>Shareable:</strong> Can be deployed with your website</li>
+                        <li>✅ <strong>Backup:</strong> Safe copy of your product data</li>
+                        <li>⚠️ <strong>Manual:</strong> Must be manually updated from exports</li>
+                    </ul>
+                </div>
+                
+                <div class="info-section">
+                    <h4><i class="fas fa-flow-chart"></i> Data Flow</h4>
+                    <ol>
+                        <li><strong>First Visit:</strong> Website loads from data/products.json → saves to localStorage</li>
+                        <li><strong>Admin Changes:</strong> Add/edit/delete products → saves to localStorage</li>
+                        <li><strong>Website Display:</strong> Always loads from localStorage (if available)</li>
+                        <li><strong>Export:</strong> Download localStorage data as JSON file for backup</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Data Viewer Modal -->
+    <div id="data-modal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2 id="modal-title">Data Viewer</h2>
+                <button class="modal-close" onclick="closeDataModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <pre id="data-content" style="background: #f8f9fa; padding: 1rem; border-radius: 8px; max-height: 400px; overflow-y: auto; white-space: pre-wrap; font-size: 0.9rem;"></pre>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeDataModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/admin.js"></script>
+    <script>
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            if (!AdminAuth.requireAuth()) {
+                return;
+            }
+
+            // Update session info
+            updateSessionInfo();
+            
+            // Load data status
+            updateDataStatus();
+        });
+
+        async function updateDataStatus() {
+            try {
+                // Check localStorage
+                const localProducts = localStorage.getItem('products');
+                const localCount = localProducts ? JSON.parse(localProducts).length : 0;
+                document.getElementById('localStorage-count').textContent = localCount;
+                
+                // Check JSON file
+                try {
+                    const response = await fetch('../data/products.json');
+                    const jsonProducts = await response.json();
+                    document.getElementById('json-count').textContent = jsonProducts.length;
+                } catch (error) {
+                    document.getElementById('json-count').textContent = 'Error loading';
+                }
+                
+            } catch (error) {
+                console.error('Error updating data status:', error);
+            }
+        }
+
+        function viewLocalStorageData() {
+            const localProducts = localStorage.getItem('products');
+            if (localProducts) {
+                const products = JSON.parse(localProducts);
+                showDataModal('LocalStorage Products', JSON.stringify(products, null, 2));
+            } else {
+                AdminUtils.showNotification('No localStorage data found', 'info');
+            }
+        }
+
+        async function viewJsonData() {
+            try {
+                const response = await fetch('../data/products.json');
+                const products = await response.json();
+                showDataModal('JSON File Products', JSON.stringify(products, null, 2));
+            } catch (error) {
+                AdminUtils.showNotification('Error loading JSON data', 'error');
+            }
+        }
+
+        async function importFromJson() {
+            if (confirm('This will replace all localStorage data with data from products.json. Continue?')) {
+                try {
+                    const response = await fetch('../data/products.json');
+                    const products = await response.json();
+                    
+                    localStorage.setItem('products', JSON.stringify(products));
+                    AdminUtils.showNotification(`Imported ${products.length} products from JSON file!`, 'success');
+                    updateDataStatus();
+                    
+                } catch (error) {
+                    AdminUtils.showNotification('Error importing from JSON', 'error');
+                }
+            }
+        }
+
+        function exportToJson() {
+            const localProducts = localStorage.getItem('products');
+            if (!localProducts) {
+                AdminUtils.showNotification('No localStorage data to export', 'info');
+                return;
+            }
+            
+            const products = JSON.parse(localProducts);
+            const jsonString = JSON.stringify(products, null, 2);
+            
+            // Create download
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'products.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            AdminUtils.showNotification(`Exported ${products.length} products to products.json!`, 'success');
+        }
+
+        async function resetToDefault() {
+            if (confirm('This will clear localStorage and reload from products.json. All admin changes will be lost. Continue?')) {
+                try {
+                    localStorage.removeItem('products');
+                    
+                    const response = await fetch('../data/products.json');
+                    const products = await response.json();
+                    localStorage.setItem('products', JSON.stringify(products));
+                    
+                    AdminUtils.showNotification('Data reset to default successfully!', 'success');
+                    updateDataStatus();
+                    
+                } catch (error) {
+                    AdminUtils.showNotification('Error resetting data', 'error');
+                }
+            }
+        }
+
+        function clearLocalStorage() {
+            if (confirm('This will clear all localStorage product data. The website will fall back to products.json. Continue?')) {
+                localStorage.removeItem('products');
+                AdminUtils.showNotification('LocalStorage cleared!', 'success');
+                updateDataStatus();
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('This will clear ALL product data from localStorage. Are you absolutely sure?')) {
+                if (confirm('Last chance! This cannot be undone. Clear all data?')) {
+                    localStorage.removeItem('products');
+                    AdminUtils.showNotification('All data cleared!', 'warning');
+                    updateDataStatus();
+                }
+            }
+        }
+
+        function loadFromJson() {
+            importFromJson();
+        }
+
+        function showDataModal(title, content) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('data-content').textContent = content;
+            document.getElementById('data-modal').style.display = 'flex';
+        }
+
+        function closeDataModal() {
+            document.getElementById('data-modal').style.display = 'none';
+        }
+
+        function updateSessionInfo() {
+            const session = AdminAuth.getSession();
+            if (session) {
+                document.getElementById('admin-username').textContent = `Welcome, ${session.username}!`;
+            }
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(e) {
+            const modal = document.getElementById('data-modal');
+            if (e.target === modal) {
+                closeDataModal();
+            }
+        });
+    </script>
+
+    <style>
+        .data-status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .status-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .status-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .status-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-header i {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+
+        .status-header h4 {
+            margin: 0;
+            color: var(--text-dark);
+        }
+
+        .status-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .status-description {
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+
+        .status-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .sync-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .sync-action {
+            display: flex;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
+        }
+
+        .sync-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .sync-content h4 {
+            margin: 0 0 0.5rem 0;
+            color: var(--text-dark);
+        }
+
+        .sync-content p {
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .info-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .info-section h4 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .info-section ul, .info-section ol {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .info-section li {
+            margin-bottom: 0.25rem;
+            color: var(--text-dark);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            padding: 1.5rem;
+            border-top: 1px solid #e9ecef;
+        }
+
+        @media (max-width: 768px) {
+            .data-status-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .sync-actions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .sync-action {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .status-actions {
+                justify-content: center;
+            }
+        }
+    </style>
+</body>
+</html> 

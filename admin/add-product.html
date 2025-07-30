@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product - Golden Crumb Admin</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="admin-dashboard">
+    <header class="admin-header">
+        <nav class="admin-nav">
+            <div class="admin-logo">
+                <i class="fas fa-cookie-bite"></i>
+                <span>Golden Crumb Admin</span>
+            </div>
+            <div class="admin-user">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="admin-username">Admin</span>
+                </div>
+                <button onclick="AdminAuth.logout()" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="admin-container">
+        <div class="products-header">
+            <div class="header-left">
+                <h1 class="page-title">Add New Product</h1>
+                <p style="color: var(--text-light); font-size: 1.1rem;">
+                    Create a new biscuit product for your catalog
+                </p>
+            </div>
+            <div class="header-actions">
+                <a href="dashboard.html" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+                <a href="manage-products.html" class="btn btn-info">
+                    <i class="fas fa-list"></i>
+                    View All Products
+                </a>
+            </div>
+        </div>
+
+        <!-- Product Form -->
+        <div class="dashboard-card">
+            <form id="add-product-form" class="product-form">
+                <div class="form-grid">
+                    <!-- Basic Information -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-info-circle"></i>
+                            Basic Information
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label for="product-name">
+                                <i class="fas fa-tag"></i>
+                                Product Name *
+                            </label>
+                            <input type="text" id="product-name" name="name" required 
+                                   placeholder="e.g., Classic Butter Biscuits"
+                                   maxlength="100">
+                            <div class="char-counter">
+                                <span id="name-counter">0</span>/100 characters
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="product-description">
+                                <i class="fas fa-align-left"></i>
+                                Description *
+                            </label>
+                            <textarea id="product-description" name="description" required 
+                                      placeholder="Describe your delicious biscuit..."
+                                      rows="4" maxlength="500"></textarea>
+                            <div class="char-counter">
+                                <span id="description-counter">0</span>/500 characters
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="product-price">
+                                    <i class="fas fa-random"></i>
+                                    Price *
+                                </label>
+                                <input type="number" id="product-price" name="price" required 
+                                       min="0" step="0.01" placeholder="9.99">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="product-category">
+                                    <i class="fas fa-folder"></i>
+                                    Category *
+                                </label>
+                                <select id="product-category" name="category" required>
+                                    <option value="">Select category...</option>
+                                    <option value="sweet">Sweet</option>
+                                    <option value="savory">Savory</option>
+                                    <option value="specialty">Specialty</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product Image -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-image"></i>
+                            Product Image
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label for="product-image">
+                                <i class="fas fa-image"></i>
+                                Product Image *
+                            </label>
+                            <div class="image-upload-container">
+                                <div class="image-drop-zone" id="image-drop-zone">
+                                    <div class="drop-zone-content">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <h4>Drag & Drop Image Here</h4>
+                                        <p>or</p>
+                                        <button type="button" class="btn btn-secondary" onclick="document.getElementById('image-file-input').click()">
+                                            <i class="fas fa-folder-open"></i>
+                                            Browse Files
+                                        </button>
+                                        <small>Supports: JPG, PNG, GIF, WebP (Max 5MB)</small>
+                                    </div>
+                                    <input type="file" id="image-file-input" accept="image/*" style="display: none;">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group" style="margin-top: 1rem;">
+                                <label for="product-image">
+                                    <i class="fas fa-link"></i>
+                                    Or Enter Image Path
+                                </label>
+                                <input type="text" id="product-image" name="image" 
+                                       placeholder="images/my-product.jpg">
+                                <div class="form-help">
+                                    <i class="fas fa-info-circle"></i>
+                                    You can also manually enter the path to an existing image
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Image Preview -->
+                        <div class="image-preview-container">
+                            <div class="image-preview" id="image-preview">
+                                <i class="fas fa-image"></i>
+                                <span>Image Preview</span>
+                                <small>Upload an image or enter a path to see preview</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ingredients Section -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-list-ul"></i>
+                        Ingredients
+                    </h3>
+                    
+                    <div class="ingredients-container">
+                        <div class="ingredients-input-group">
+                            <input type="text" id="ingredient-input" placeholder="Enter an ingredient..."
+                                   maxlength="50">
+                            <button type="button" id="add-ingredient-btn" class="btn btn-primary">
+                                <i class="fas fa-plus"></i>
+                                Add
+                            </button>
+                        </div>
+                        
+                        <div class="ingredients-list" id="ingredients-list">
+                            <div class="no-ingredients">
+                                <i class="fas fa-info-circle"></i>
+                                No ingredients added yet. Add at least one ingredient.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Options -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-cogs"></i>
+                        Product Options
+                    </h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="product-in-stock" name="in_stock" checked>
+                                <span class="checkbox-custom"></span>
+                                <div>
+                                    <strong>In Stock</strong>
+                                    <small>Product is available for purchase</small>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="form-group checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="product-featured" name="featured">
+                                <span class="checkbox-custom"></span>
+                                <div>
+                                    <strong>Featured Product</strong>
+                                    <small>Highlight this product on the homepage</small>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                        <i class="fas fa-undo"></i>
+                        Reset Form
+                    </button>
+                    <button type="submit" class="btn btn-success" id="submit-btn">
+                        <i class="fas fa-plus-circle"></i>
+                        Add Product
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Product Preview -->
+        <div class="dashboard-card" id="product-preview-card" style="display: none;">
+            <h3 class="card-title">
+                <i class="fas fa-eye"></i>
+                Product Preview
+            </h3>
+            <div id="product-preview-content">
+                <!-- Preview will be generated here -->
+            </div>
+        </div>
+    </main>
+
+    <script src="js/admin.js"></script>
+    <script>
+        let ingredients = [];
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            if (!AdminAuth.requireAuth()) {
+                return;
+            }
+
+            // Update session info
+            updateSessionInfo();
+            
+            // Initialize form functionality
+            initializeForm();
+        });
+
+        function initializeForm() {
+            // Character counters
+            setupCharacterCounters();
+            
+            // Image preview
+            setupImagePreview();
+            
+            // Ingredients functionality
+            setupIngredients();
+            
+            // Form submission
+            document.getElementById('add-product-form').addEventListener('submit', handleFormSubmit);
+            
+            // Real-time preview
+            setupLivePreview();
+        }
+
+        function setupCharacterCounters() {
+            const nameInput = document.getElementById('product-name');
+            const descInput = document.getElementById('product-description');
+            
+            nameInput.addEventListener('input', function() {
+                document.getElementById('name-counter').textContent = this.value.length;
+            });
+            
+            descInput.addEventListener('input', function() {
+                document.getElementById('description-counter').textContent = this.value.length;
+            });
+        }
+
+        function setupImagePreview() {
+            const imageInput = document.getElementById('product-image');
+            const fileInput = document.getElementById('image-file-input');
+            const dropZone = document.getElementById('image-drop-zone');
+            const preview = document.getElementById('image-preview');
+            
+            // Handle text input changes
+            imageInput.addEventListener('input', function() {
+                const imagePath = this.value.trim();
+                if (imagePath) {
+                    previewImageFromPath(imagePath);
+                } else {
+                    resetPreview();
+                }
+            });
+            
+            // Handle file input changes
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    handleImageFile(file);
+                }
+            });
+            
+            // Handle drag and drop
+            dropZone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.add('drag-over');
+            });
+            
+            dropZone.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.remove('drag-over');
+            });
+            
+            dropZone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.remove('drag-over');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    const file = files[0];
+                    if (file.type.startsWith('image/')) {
+                        handleImageFile(file);
+                    } else {
+                        AdminUtils.showNotification('Please drop an image file', 'error');
+                    }
+                }
+            });
+        }
+        
+        function previewImageFromPath(imagePath) {
+            const preview = document.getElementById('image-preview');
+            const testImage = new Image();
+            
+            testImage.onload = function() {
+                preview.innerHTML = `
+                    <img src="${this.src}" alt="Product preview" style="max-width: 100%; height: auto; border-radius: 8px;">
+                    <div class="image-info">
+                        <small>Path: ${imagePath}</small>
+                    </div>
+                `;
+            };
+            
+            testImage.onerror = function() {
+                preview.innerHTML = `
+                    <i class="fas fa-exclamation-triangle" style="color: var(--error);"></i>
+                    <span>Image not found</span>
+                    <small>Check the path: ${imagePath}</small>
+                `;
+            };
+            
+            // Try different path variations
+            if (imagePath.startsWith('images/')) {
+                testImage.src = '../' + imagePath;
+            } else if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+                testImage.src = imagePath;
+            } else {
+                testImage.src = '../images/' + imagePath;
+            }
+        }
+        
+        function handleImageFile(file) {
+            const preview = document.getElementById('image-preview');
+            const imageInput = document.getElementById('product-image');
+            
+            // Validate file size (5MB limit)
+            if (file.size > 5 * 1024 * 1024) {
+                AdminUtils.showNotification('Image file is too large. Maximum size is 5MB.', 'error');
+                return;
+            }
+            
+            // Validate file type
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+            if (!validTypes.includes(file.type)) {
+                AdminUtils.showNotification('Invalid file type. Please upload JPG, PNG, GIF, or WebP.', 'error');
+                return;
+            }
+            
+            // Create file reader to preview image
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const imageName = generateImageName(file.name);
+                const imagePath = 'images/' + imageName;
+                
+                // Update the path input
+                imageInput.value = imagePath;
+                
+                // Show preview
+                preview.innerHTML = `
+                    <img src="${e.target.result}" alt="Product preview" style="max-width: 100%; height: auto; border-radius: 8px;">
+                    <div class="image-info">
+                        <small>
+                            <strong>File:</strong> ${file.name}<br>
+                            <strong>Size:</strong> ${formatFileSize(file.size)}<br>
+                            <strong>Path:</strong> ${imagePath}
+                        </small>
+                        <div class="upload-note">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Remember to save this image as <strong>${imageName}</strong> in your images folder!</span>
+                        </div>
+                    </div>
+                `;
+                
+                // Store the file data for potential future upload functionality
+                window.selectedImageFile = {
+                    file: file,
+                    name: imageName,
+                    path: imagePath,
+                    dataUrl: e.target.result
+                };
+                
+                AdminUtils.showNotification(`Image "${file.name}" loaded! Save it as "${imageName}" in your images folder.`, 'success');
+                updatePreview();
+            };
+            
+            reader.readAsDataURL(file);
+        }
+        
+        function generateImageName(originalName) {
+            // Just clean the filename without adding timestamp
+            const cleanName = originalName
+                .toLowerCase()
+                .replace(/[^a-z0-9.]/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-|-$/g, '');
+            
+            return cleanName;
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        function resetPreview() {
+            const preview = document.getElementById('image-preview');
+            preview.innerHTML = `
+                <i class="fas fa-image"></i>
+                <span>Image Preview</span>
+                <small>Upload an image or enter a path to see preview</small>
+            `;
+        }
+
+        function setupIngredients() {
+            const input = document.getElementById('ingredient-input');
+            const addBtn = document.getElementById('add-ingredient-btn');
+            const list = document.getElementById('ingredients-list');
+            
+            // Add ingredient on button click
+            addBtn.addEventListener('click', addIngredient);
+            
+            // Add ingredient on Enter key
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addIngredient();
+                }
+            });
+        }
+
+        function addIngredient() {
+            const input = document.getElementById('ingredient-input');
+            const ingredient = input.value.trim();
+            
+            if (!ingredient) {
+                AdminUtils.showNotification('Please enter an ingredient name', 'warning');
+                return;
+            }
+            
+            if (ingredients.includes(ingredient)) {
+                AdminUtils.showNotification('This ingredient is already added', 'warning');
+                return;
+            }
+            
+            if (ingredients.length >= 10) {
+                AdminUtils.showNotification('Maximum 10 ingredients allowed', 'warning');
+                return;
+            }
+            
+            ingredients.push(ingredient);
+            input.value = '';
+            updateIngredientsList();
+            updatePreview();
+        }
+
+        function removeIngredient(ingredient) {
+            ingredients = ingredients.filter(item => item !== ingredient);
+            updateIngredientsList();
+            updatePreview();
+        }
+
+        function updateIngredientsList() {
+            const list = document.getElementById('ingredients-list');
+            
+            if (ingredients.length === 0) {
+                list.innerHTML = `
+                    <div class="no-ingredients">
+                        <i class="fas fa-info-circle"></i>
+                        No ingredients added yet. Add at least one ingredient.
+                    </div>
+                `;
+                return;
+            }
+            
+            list.innerHTML = ingredients.map(ingredient => `
+                <div class="ingredient-tag">
+                    <span>${ingredient}</span>
+                    <button type="button" onclick="removeIngredient('${ingredient}')" class="remove-ingredient">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function setupLivePreview() {
+            const form = document.getElementById('add-product-form');
+            const inputs = form.querySelectorAll('input, textarea, select');
+            
+            inputs.forEach(input => {
+                input.addEventListener('input', updatePreview);
+                input.addEventListener('change', updatePreview);
+            });
+        }
+
+        function updatePreview() {
+            const formData = getFormData();
+            const previewCard = document.getElementById('product-preview-card');
+            const previewContent = document.getElementById('product-preview-content');
+            
+            if (formData.name || formData.description) {
+                previewCard.style.display = 'block';
+                
+                previewContent.innerHTML = `
+                    <div class="product-preview-item">
+                        <div class="product-image">
+                            <img src="../${formData.image}" alt="${formData.name}" 
+                                 onerror="this.src='../images/placeholder.svg'">
+                        </div>
+                        <div class="product-details">
+                            <h4>${formData.name || 'Product Name'}</h4>
+                            <p class="price">R${formData.price || '0.00'}</p>
+                            <p class="category">${formData.category || 'No category'}</p>
+                            <p class="description">${formData.description || 'No description'}</p>
+                            <div class="ingredients">
+                                <strong>Ingredients:</strong> 
+                                ${ingredients.length > 0 ? ingredients.join(', ') : 'None added'}
+                            </div>
+                            <div class="product-status">
+                                ${formData.in_stock ? '<span class="status in-stock">In Stock</span>' : '<span class="status out-of-stock">Out of Stock</span>'}
+                                ${formData.featured ? '<span class="status featured">Featured</span>' : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                previewCard.style.display = 'none';
+            }
+        }
+
+        function getFormData() {
+            return {
+                name: document.getElementById('product-name').value.trim(),
+                description: document.getElementById('product-description').value.trim(),
+                price: parseFloat(document.getElementById('product-price').value) || 0,
+                category: document.getElementById('product-category').value,
+                image: document.getElementById('product-image').value.trim(),
+                in_stock: document.getElementById('product-in-stock').checked,
+                featured: document.getElementById('product-featured').checked
+            };
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submit-btn');
+            const originalText = submitBtn.innerHTML;
+            
+            // Show loading state
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding Product...';
+            submitBtn.disabled = true;
+            
+            try {
+                const formData = getFormData();
+                
+                // Validate form
+                const errors = validateForm(formData);
+                if (errors.length > 0) {
+                    throw new Error(errors.join('\n'));
+                }
+                
+                // Add ingredients to form data
+                formData.ingredients = [...ingredients];
+                
+                // Add product using ProductManager
+                const newProduct = await ProductManager.addProduct(formData);
+                
+                AdminUtils.showNotification(`Product "${newProduct.name}" added successfully!`, 'success');
+                
+                // Reset form or redirect
+                setTimeout(() => {
+                    if (confirm('Product added successfully! Would you like to add another product?')) {
+                        resetForm();
+                    } else {
+                        window.location.href = 'manage-products.html';
+                    }
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Error adding product:', error);
+                AdminUtils.showNotification(error.message, 'error');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        }
+
+        function validateForm(data) {
+            const errors = [];
+            
+            if (!data.name || data.name.length < 2) {
+                errors.push('Product name must be at least 2 characters');
+            }
+            
+            if (!data.description || data.description.length < 10) {
+                errors.push('Description must be at least 10 characters');
+            }
+            
+            if (!data.price || data.price <= 0) {
+                errors.push('Price must be greater than 0');
+            }
+            
+            if (!data.category) {
+                errors.push('Please select a category');
+            }
+            
+            if (!data.image) {
+                errors.push('Please provide an image for the product');
+            }
+            
+            if (ingredients.length === 0) {
+                errors.push('Please add at least one ingredient');
+            }
+            
+            return errors;
+        }
+
+        function resetForm() {
+            if (confirm('Are you sure you want to reset the form? All data will be lost.')) {
+                document.getElementById('add-product-form').reset();
+                ingredients = [];
+                updateIngredientsList();
+                document.getElementById('name-counter').textContent = '0';
+                document.getElementById('description-counter').textContent = '0';
+                document.getElementById('product-preview-card').style.display = 'none';
+                
+                // Reset image preview
+                resetPreview();
+                
+                // Clear any stored image file
+                window.selectedImageFile = null;
+                
+                // Reset file input
+                document.getElementById('image-file-input').value = '';
+                
+                AdminUtils.showNotification('Form reset successfully', 'info');
+            }
+        }
+
+        function updateSessionInfo() {
+            const session = AdminAuth.getSession();
+            if (session) {
+                document.getElementById('admin-username').textContent = `Welcome, ${session.username}!`;
+            }
+        }
+    </script>
+
+    <style>
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .char-counter {
+            text-align: right;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 0.25rem;
+        }
+
+        .image-preview-container {
+            margin-top: 1rem;
+        }
+
+        .image-upload-container {
+            margin-bottom: 1rem;
+        }
+
+        .image-drop-zone {
+            border: 3px dashed #ddd;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            background: #fafafa;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .image-drop-zone:hover {
+            border-color: var(--primary-color);
+            background: #f0f8ff;
+        }
+
+        .image-drop-zone.drag-over {
+            border-color: var(--primary-color);
+            background: #e8f4fd;
+            border-style: solid;
+        }
+
+        .drop-zone-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .drop-zone-content i {
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        .drop-zone-content h4 {
+            margin: 0;
+            color: var(--text-dark);
+        }
+
+        .drop-zone-content p {
+            margin: 0;
+            color: var(--text-light);
+        }
+
+        .drop-zone-content small {
+            color: var(--text-light);
+            font-size: 0.8rem;
+        }
+
+        .image-preview {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            background: white;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .image-info {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: left;
+        }
+
+        .image-info small {
+            color: var(--text-dark);
+            line-height: 1.4;
+        }
+
+        .upload-note {
+            margin-top: 0.5rem;
+            padding: 0.75rem;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            color: #856404;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .upload-note i {
+            margin-top: 0.125rem;
+            flex-shrink: 0;
+        }
+
+        .ingredients-input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .ingredients-input-group input {
+            flex: 1;
+        }
+
+        .ingredients-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            min-height: 40px;
+        }
+
+        .ingredient-tag {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .remove-ingredient {
+            background: rgba(255,255,255,0.3);
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+        }
+
+        .remove-ingredient:hover {
+            background: rgba(255,255,255,0.5);
+        }
+
+        .no-ingredients {
+            color: var(--text-light);
+            font-style: italic;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .checkbox-group {
+            margin: 0;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            cursor: pointer;
+            padding: 1rem;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+        }
+
+        .checkbox-label:hover {
+            background: rgba(212, 165, 116, 0.1);
+        }
+
+        .checkbox-custom {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 2px;
+        }
+
+        input[type="checkbox"] {
+            display: none;
+        }
+
+        input[type="checkbox"]:checked + .checkbox-custom {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        input[type="checkbox"]:checked + .checkbox-custom::after {
+            content: '✓';
+            color: white;
+            font-weight: bold;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            padding-top: 2rem;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .product-preview-item {
+            display: flex;
+            gap: 1.5rem;
+            padding: 1rem;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            background: white;
+        }
+
+        .product-preview-item .product-image {
+            width: 100px;
+            height: 100px;
+            flex-shrink: 0;
+        }
+
+        .product-preview-item .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .product-details h4 {
+            margin: 0 0 0.5rem 0;
+            color: var(--text-dark);
+        }
+
+        .product-details .price {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 0 0 0.5rem 0;
+        }
+
+        .product-details .category {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            text-transform: capitalize;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .product-details .description {
+            color: var(--text-dark);
+            margin: 0 0 1rem 0;
+            line-height: 1.4;
+        }
+
+        .product-details .ingredients {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+
+        .product-status {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .product-status .status {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status.in-stock {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.out-of-stock {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status.featured {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .product-preview-item {
+                flex-direction: column;
+            }
+            
+            .product-preview-item .product-image {
+                width: 100%;
+                height: 200px;
+            }
+        }
+    </style>
+</body>
+</html> 

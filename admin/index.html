@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Golden Crumb Biscuit Company</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="login-page">
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo">
+                    <i class="fas fa-cookie-bite"></i>
+                    <h1>Golden Crumb</h1>
+                </div>
+                <h2>Admin Login</h2>
+                <p>Please sign in to manage your biscuit shop</p>
+            </div>
+            
+            <div id="error-message" class="error-message" style="display: none;">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span id="error-text"></span>
+            </div>
+            
+            <form id="login-form" class="login-form">
+                <div class="form-group">
+                    <label for="username">
+                        <i class="fas fa-user"></i>
+                        Username
+                    </label>
+                    <input type="text" id="username" name="username" required 
+                           placeholder="Enter your username">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i>
+                        Password
+                    </label>
+                    <input type="password" id="password" name="password" required 
+                           placeholder="Enter your password">
+                </div>
+                
+                <button type="submit" class="login-btn" id="login-btn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Sign In
+                </button>
+            </form>
+            
+            <div class="login-footer">
+                <div class="login-info">
+                    <h4>Default Credentials:</h4>
+                    <p><strong>Username:</strong> admin</p>
+                    <p><strong>Password:</strong> goldencrumb2024</p>
+                    <small>⚠️ Change these credentials in admin.js for production!</small>
+                </div>
+                
+                <div class="back-link">
+                    <a href="../">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Website
+                    </a>
+                </div>
+                
+                <div id="logout-message" class="logout-message" style="display: none;">
+                    <i class="fas fa-check-circle"></i>
+                    You have been successfully logged out.
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/admin.js"></script>
+    <script>
+        // Initialize login page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if already logged in
+            if (AdminAuth.isLoggedIn()) {
+                window.location.href = 'dashboard.html';
+                return;
+            }
+            
+            // Show logout message if redirected from logout
+            if (window.location.search.includes('logged_out=1')) {
+                document.getElementById('logout-message').style.display = 'block';
+            }
+            
+            // Auto-focus username field
+            document.getElementById('username').focus();
+            
+            // Handle login form
+            document.getElementById('login-form').addEventListener('submit', handleLogin);
+        });
+        
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('login-btn');
+            const errorDiv = document.getElementById('error-message');
+            const errorText = document.getElementById('error-text');
+            
+            // Hide previous errors
+            errorDiv.style.display = 'none';
+            
+            // Show loading state
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing In...';
+            loginBtn.disabled = true;
+            
+            try {
+                const success = await AdminAuth.login(username, password);
+                
+                if (success) {
+                    window.location.href = 'dashboard.html';
+                } else {
+                    throw new Error('Invalid username or password');
+                }
+                
+            } catch (error) {
+                errorText.textContent = error.message;
+                errorDiv.style.display = 'flex';
+                
+                // Reset button
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+                loginBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html> 

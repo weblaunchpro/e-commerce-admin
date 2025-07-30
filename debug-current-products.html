@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Current Products</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .product { margin: 20px 0; padding: 15px; border: 1px solid #ddd; background: #f9f9f9; }
+        .image-test { margin: 10px 0; }
+        img { max-width: 150px; border: 1px solid #ccc; }
+        .error { border: 3px solid red !important; }
+        .success { border: 3px solid green !important; }
+        .path { background: #fff; padding: 5px; font-family: monospace; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <h1>Current Products in localStorage</h1>
+    <div id="products-container"></div>
+    
+    <script>
+        function debugProducts() {
+            const products = localStorage.getItem('products');
+            const container = document.getElementById('products-container');
+            
+            if (!products) {
+                container.innerHTML = '<p>No products found in localStorage</p>';
+                return;
+            }
+            
+            const parsed = JSON.parse(products);
+            
+            container.innerHTML = parsed.map((product, index) => `
+                <div class="product">
+                    <h2>Product ${index + 1}: ${product.name}</h2>
+                    <p><strong>ID:</strong> ${product.id}</p>
+                    <p><strong>Image Path:</strong></p>
+                    <div class="path">${product.image}</div>
+                    
+                    <div class="image-test">
+                        <h3>Image Test:</h3>
+                        <img src="${product.image}" alt="${product.name}" 
+                             onload="this.className='success'; this.title='✅ Image loads successfully!'" 
+                             onerror="this.className='error'; this.title='❌ Image failed to load: ' + this.src; this.alt='FAILED: ' + this.src;">
+                    </div>
+                    
+                    <div class="image-test">
+                        <h3>Alternative Path Test (./ prefix):</h3>
+                        <img src="./${product.image}" alt="${product.name}" 
+                             onload="this.className='success'; this.title='✅ Alternative path works!'" 
+                             onerror="this.className='error'; this.title='❌ Alternative path failed: ' + this.src; this.alt='FAILED: ' + this.src;">
+                    </div>
+                    
+                    <p><strong>Full Product Data:</strong></p>
+                    <pre style="background: #fff; padding: 10px; font-size: 12px;">${JSON.stringify(product, null, 2)}</pre>
+                </div>
+            `).join('');
+        }
+        
+        window.onload = debugProducts;
+    </script>
+</body>
+</html> 

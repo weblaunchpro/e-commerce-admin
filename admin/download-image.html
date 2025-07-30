@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Image - Golden Crumb Admin</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <style>
+        .download-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .download-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .download-instructions {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+            margin-bottom: 2rem;
+        }
+        
+        .image-display {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .image-display img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .download-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        
+        .file-info {
+            background: #e8f4fd;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .file-info strong {
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="download-container">
+        <div class="download-header">
+            <h1><i class="fas fa-download"></i> Download Product Image</h1>
+            <p>Save the uploaded image to your images folder</p>
+        </div>
+        
+        <div id="image-content">
+            <div class="no-image">
+                <i class="fas fa-image" style="font-size: 3rem; color: #ccc; margin-bottom: 1rem;"></i>
+                <p>No image to download</p>
+                <small>This page is accessed from the add product form when you upload an image.</small>
+            </div>
+        </div>
+        
+        <div class="download-actions">
+            <a href="add-product.html" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i>
+                Back to Add Product
+            </a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if there's image data from the parent window or localStorage
+            const imageData = getImageData();
+            
+            if (imageData) {
+                displayImageForDownload(imageData);
+            }
+        });
+        
+        function getImageData() {
+            // Try to get from URL parameters first
+            const urlParams = new URLSearchParams(window.location.search);
+            const imageName = urlParams.get('name');
+            const imageDataUrl = urlParams.get('data');
+            
+            if (imageName && imageDataUrl) {
+                return {
+                    name: imageName,
+                    dataUrl: decodeURIComponent(imageDataUrl),
+                    path: 'images/' + imageName
+                };
+            }
+            
+            // Try to get from localStorage
+            const storedData = localStorage.getItem('tempImageData');
+            if (storedData) {
+                localStorage.removeItem('tempImageData'); // Clean up
+                return JSON.parse(storedData);
+            }
+            
+            // Try to get from opener window
+            if (window.opener && window.opener.selectedImageFile) {
+                return window.opener.selectedImageFile;
+            }
+            
+            return null;
+        }
+        
+        function displayImageForDownload(imageData) {
+            const container = document.getElementById('image-content');
+            
+            container.innerHTML = `
+                <div class="file-info">
+                    <div><strong>File Name:</strong> ${imageData.name}</div>
+                    <div><strong>Save Path:</strong> ${imageData.path}</div>
+                    <div><strong>Instructions:</strong> Right-click the image below and select "Save image as..." then save it to your project's images folder</div>
+                </div>
+                
+                <div class="image-display">
+                    <img src="${imageData.dataUrl}" alt="Product Image" id="downloadable-image">
+                </div>
+                
+                <div class="download-instructions">
+                    <h4><i class="fas fa-info-circle"></i> How to Save This Image:</h4>
+                    <ol>
+                        <li><strong>Right-click</strong> on the image above</li>
+                        <li>Select <strong>"Save image as..."</strong> or <strong>"Save picture as..."</strong></li>
+                        <li>Navigate to your project's <code>images/</code> folder</li>
+                        <li>Save the file as: <strong>${imageData.name}</strong></li>
+                        <li>The image will now be available for your product!</li>
+                    </ol>
+                </div>
+            `;
+            
+            // Add download button for modern browsers
+            if (supportsDownload()) {
+                const downloadBtn = document.createElement('button');
+                downloadBtn.className = 'btn btn-primary';
+                downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download Image';
+                downloadBtn.onclick = () => downloadImage(imageData.dataUrl, imageData.name);
+                
+                const actions = document.querySelector('.download-actions');
+                actions.insertBefore(downloadBtn, actions.firstChild);
+            }
+        }
+        
+        function supportsDownload() {
+            const a = document.createElement('a');
+            return typeof a.download !== 'undefined';
+        }
+        
+        function downloadImage(dataUrl, filename) {
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html> 

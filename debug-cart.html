@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Cart</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { padding: 10px; margin: 5px; background: #007bff; color: white; border: none; cursor: pointer; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <h1>Cart Debug</h1>
+    
+    <div class="section">
+        <h2>Current Cart Contents:</h2>
+        <pre id="cart-contents"></pre>
+        <button onclick="refreshCart()">Refresh Cart Display</button>
+    </div>
+    
+    <div class="section">
+        <h2>Test Add to Cart:</h2>
+        <button onclick="testAddToCart(1)">Add Product ID 1</button>
+        <button onclick="testAddToCart(2)">Add Product ID 2</button>
+        <button onclick="clearCart()">Clear Cart</button>
+    </div>
+    
+    <div class="section">
+        <h2>Cart Count Test:</h2>
+        <p>Cart Count: <span id="cart-count">0</span></p>
+    </div>
+    
+    <script>
+        function refreshCart() {
+            const cart = localStorage.getItem('cart');
+            const cartContents = document.getElementById('cart-contents');
+            
+            if (cart) {
+                const parsed = JSON.parse(cart);
+                cartContents.textContent = JSON.stringify(parsed, null, 2);
+                
+                // Update count display
+                const totalItems = parsed.reduce((sum, item) => sum + item.quantity, 0);
+                document.getElementById('cart-count').textContent = totalItems;
+            } else {
+                cartContents.textContent = 'Cart is empty';
+                document.getElementById('cart-count').textContent = '0';
+            }
+        }
+        
+        function testAddToCart(productId) {
+            console.log('Testing add to cart for product:', productId);
+            
+            try {
+                // Get existing cart from localStorage
+                let cart = JSON.parse(localStorage.getItem('cart')) || [];
+                
+                // Check if product already exists in cart
+                const existingItem = cart.find(item => item.productId === productId);
+                
+                if (existingItem) {
+                    existingItem.quantity += 1;
+                    console.log('Updated existing item quantity');
+                } else {
+                    cart.push({
+                        productId: productId,
+                        quantity: 1,
+                        addedAt: new Date().toISOString()
+                    });
+                    console.log('Added new item to cart');
+                }
+                
+                // Save updated cart
+                localStorage.setItem('cart', JSON.stringify(cart));
+                console.log('Cart saved to localStorage');
+                
+                refreshCart();
+                alert('Product added to cart!');
+                
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        function clearCart() {
+            localStorage.removeItem('cart');
+            refreshCart();
+            alert('Cart cleared!');
+        }
+        
+        // Load on page start
+        window.onload = refreshCart;
+    </script>
+</body>
+</html> 

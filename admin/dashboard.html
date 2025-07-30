@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Golden Crumb Biscuit Company</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="admin-dashboard">
+    <header class="admin-header">
+        <nav class="admin-nav">
+            <div class="admin-logo">
+                <i class="fas fa-cookie-bite"></i>
+                <span>Golden Crumb Admin</span>
+            </div>
+            <div class="admin-user">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="admin-username">Admin</span>
+                </div>
+                <button onclick="AdminAuth.logout()" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="admin-container">
+        <div class="products-header">
+            <h1 class="page-title">Dashboard Overview</h1>
+            <p style="color: var(--text-light); font-size: 1.1rem;">
+                Welcome to your biscuit shop admin panel. Here's what's happening with your business.
+            </p>
+        </div>
+
+        <!-- Dashboard Stats -->
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">Total Products</h3>
+                        <div class="card-value" id="total-products">-</div>
+                        <p class="card-description" id="products-in-stock">Loading...</p>
+                    </div>
+                    <div class="card-icon">
+                        <i class="fas fa-cookie"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">Contact Messages</h3>
+                        <div class="card-value" id="total-messages">-</div>
+                        <p class="card-description" id="messages-today">Loading...</p>
+                    </div>
+                    <div class="card-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">Cart Items</h3>
+                        <div class="card-value" id="total-cart-items">-</div>
+                        <p class="card-description">Items in customer carts</p>
+                    </div>
+                    <div class="card-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">Featured Products</h3>
+                        <div class="card-value" id="featured-products">-</div>
+                        <p class="card-description">Highlighted items</p>
+                    </div>
+                    <div class="card-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="dashboard-card" style="margin-bottom: 2rem;">
+            <h3 class="card-title" style="margin-bottom: 1.5rem;">Quick Actions</h3>
+            <div class="dashboard-grid" style="margin: 0;">
+                <a href="manage-products.html" class="add-product-btn" style="text-align: center; padding: 1.5rem;">
+                    <i class="fas fa-cogs"></i>
+                    Manage Products
+                </a>
+                <a href="add-product.html" class="add-product-btn" style="text-align: center; padding: 1.5rem;">
+                    <i class="fas fa-plus"></i>
+                    Add New Product
+                </a>
+                <a href="view-messages.html" class="add-product-btn" style="background: var(--info); text-align: center; padding: 1.5rem;">
+                    <i class="fas fa-comments"></i>
+                    View Messages
+                </a>
+                <a href="sync-data.html" class="add-product-btn" style="background: var(--warning); text-align: center; padding: 1.5rem;">
+                    <i class="fas fa-sync-alt"></i>
+                    Data Sync
+                </a>
+                <a href="../index.html" class="add-product-btn" style="background: var(--secondary-color); text-align: center; padding: 1.5rem;">
+                    <i class="fas fa-globe"></i>
+                    View Website
+                </a>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="dashboard-card">
+            <h3 class="card-title" style="margin-bottom: 1.5rem;">Recent Activity</h3>
+            <div style="color: var(--text-light);" id="recent-activity">
+                <div style="padding: 1rem 0; border-bottom: 1px solid #eee;">
+                    <i class="fas fa-user-plus" style="color: var(--success); margin-right: 8px;"></i>
+                    <span id="login-time">Loading...</span>
+                </div>
+                <div style="padding: 1rem 0; border-bottom: 1px solid #eee;">
+                    <i class="fas fa-database" style="color: var(--info); margin-right: 8px;"></i>
+                    Product catalog loaded successfully
+                </div>
+                <div style="padding: 1rem 0;">
+                    <i class="fas fa-chart-line" style="color: var(--primary-color); margin-right: 8px;"></i>
+                    Dashboard statistics updated
+                </div>
+            </div>
+        </div>
+
+        <!-- System Info -->
+        <div class="dashboard-card" style="margin-top: 2rem;">
+            <h3 class="card-title" style="margin-bottom: 1.5rem;">System Information</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                <div>
+                    <strong>System:</strong> JavaScript-Powered
+                </div>
+                <div>
+                    <strong>Server Time:</strong> <span id="server-time">Loading...</span>
+                </div>
+                <div>
+                    <strong>Session ID:</strong> <span id="session-id">Loading...</span>
+                </div>
+                <div>
+                    <strong>Storage:</strong> LocalStorage + JSON
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/admin.js"></script>
+    <script>
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Check authentication
+            if (!AdminAuth.requireAuth()) {
+                return;
+            }
+
+            // Load dashboard data
+            await loadDashboardData();
+
+            // Update UI with session info
+            updateSessionInfo();
+
+            // Set up auto-refresh (disabled to prevent constant refreshing)
+            // setInterval(loadDashboardData, 30000); // Refresh every 30 seconds
+        });
+
+        async function loadDashboardData() {
+            try {
+                // Load products
+                const products = await ProductManager.loadProducts();
+                const productStats = ProductManager.getStats(products);
+
+                // Update product statistics
+                document.getElementById('total-products').textContent = productStats.total;
+                document.getElementById('products-in-stock').textContent = `${productStats.inStock} in stock`;
+                document.getElementById('featured-products').textContent = productStats.featured;
+
+                // Load contact messages
+                const messageStats = ContactManager.getStats();
+                document.getElementById('total-messages').textContent = messageStats.total;
+                document.getElementById('messages-today').textContent = `${messageStats.today} today`;
+
+                // Load cart items (from customer localStorage - simplified)
+                const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+                const totalCartItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+                document.getElementById('total-cart-items').textContent = totalCartItems;
+
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                AdminUtils.showNotification('Error loading dashboard data', 'error');
+            }
+        }
+
+        function updateSessionInfo() {
+            const session = AdminAuth.getSession();
+            if (session) {
+                document.getElementById('admin-username').textContent = `Welcome, ${session.username}!`;
+                document.getElementById('login-time').textContent = 
+                    `Admin session started at ${AdminUtils.formatDate(session.loginTime)}`;
+                document.getElementById('session-id').textContent = 
+                    session.sessionId.substring(0, 10) + '...';
+            }
+
+            // Update server time
+            document.getElementById('server-time').textContent = 
+                new Date().toLocaleString();
+        }
+
+        // Hover effects now handled by CSS - no JavaScript needed
+    </script>
+</body>
+</html> 

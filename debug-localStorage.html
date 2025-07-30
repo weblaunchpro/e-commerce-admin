@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug localStorage</title>
+</head>
+<body>
+    <h1>Products in localStorage:</h1>
+    <pre id="output"></pre>
+    
+    <script>
+        const products = localStorage.getItem('products');
+        const output = document.getElementById('output');
+        
+        if (products) {
+            const parsed = JSON.parse(products);
+            output.textContent = JSON.stringify(parsed, null, 2);
+        } else {
+            output.textContent = 'No products found in localStorage';
+        }
+    </script>
+</body>
+</html> 
